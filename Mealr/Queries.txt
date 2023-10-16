@@ -1,0 +1,68 @@
+﻿--select ff.foundationFoodID, ff.[description], fc.[description], fn.[type], infood.foodDescription, fp.[value], ncf.[type]
+--from dbo.FoundationFoods ff
+----FoundationFood FoodCategory
+--inner join dbo.FoodCategories fc on ff.foodCategoryID = fc.foodCategoryID
+----FoundationFood FoodNutrients
+--inner join dbo.FoodNutrients fn on ff.foundationFoodID = fn.foundationFoodID
+--inner join dbo.Nutrients n on fn.nutrientID = n.nutrientID
+--inner join dbo.FoodNutrientDerivations fnd on fn.foodNutrientDerivationID = fnd.foodNutrientDerivationID
+--inner join dbo.FoodNutrientSource fns on fnd.foodNutrientSourceID = fns.foodNutrientSourceID
+----FoundationFood InputFoods
+--inner join dbo.InputFoods infood on ff.foundationFoodID = infood.foundationFoodID
+--inner join dbo.InputFoods2 infood2 on infood.inputFoods2ID = infood2.inputFoods2ID
+--inner join dbo.FoodCategories infoodfc on infood2.foodCategoryID = infoodfc.foodCategoryID
+----FoundationFood FoodPortion
+--LEFT OUTER join dbo.FoodPortions fp on ff.foundationFoodID = fp.foundationFoodID
+--LEFT OUTER join dbo.MeasureUnits mu on fp.measureUnitID = mu.measureUnitID
+----FoundationFood NutrientConversionFactor
+--LEFT OUTER join dbo.NutrientConversionFactors ncf on ff.foundationFoodID = ncf.foundationFoodID
+
+
+--GET FOOD AND ASSOCIATED InputFood, InputFood2, (input food) FoodCategory---------------------------------------------------------
+--select ff.foundationFoodID, ff.[description], infood.foodDescription, infood2.[description], fc.[description] 
+--from dbo.FoundationFoods ff
+--inner join dbo.InputFoods infood on ff.foundationFoodID = infood.foundationFoodID
+--inner join dbo.InputFoods2 infood2 on infood.inputFoods2ID = infood2.inputFoods2ID
+--inner join dbo.FoodCategories fc on infood2.foodCategoryID = fc.foodCategoryID
+
+--GET FOOD AND ASSOCIATED FoodPortions, MeasureUnits------------------------------------------------------------------------------
+--select ff.foundationFoodID, ff.[description], fp.gramWeight--, fp.measureUnitID, fp.[value], mu.abbreviation
+--from dbo.FoundationFoods ff
+----not all foods have food portion
+--LEFT OUTER join dbo.FoodPortions fp on ff.foundationFoodID = fp.foundationFoodID
+--LEFT OUTER join dbo.MeasureUnits mu on fp.measureUnitID = mu.measureUnitID
+
+
+--GET FOOD AND ASSOCIATED NutrientConversionFactors looks like only .CalorieConversionFactor and .ProteinConversionFactor----------
+--select ff.foundationFoodID, ff.[description], ncf.nutrientConversionFactorID, ncf.[type]
+--from dbo.FoundationFoods ff
+--not all foods have NutrientConversionFactors 
+--LEFT OUTER join dbo.NutrientConversionFactors ncf on ff.foundationFoodID = ncf.foundationFoodID
+
+
+--GET FOOD AND ASSOCIATED FoodNutrients, Nutrients, FoodNutrientDerivations, FoodNutrientSource------------------------------------
+--select distinct  n.name, n.rank, ff.[description]--, fn.amount --amount is by default per 100g of product. 
+--from dbo.FoundationFoods ff 
+--inner join dbo.FoodNutrients fn on ff.foundationFoodID = fn.foundationFoodID
+--inner join dbo.Nutrients n on fn.nutrientID = n.nutrientID
+--inner join dbo.FoodNutrientDerivations fnd on fn.foodNutrientDerivationID = fnd.foodNutrientDerivationID
+--inner join dbo.FoodNutrientSource fns on fnd.foodNutrientSourceID = fns.foodNutrientSourceID
+--where ff.[description] like 'Hummus%'
+order by n.rank
+
+
+--GET FOOD AND ASSOCIATED FOOD CATEGORY--------------------------------------------------------------------------------------------
+--select ff.foundationFoodID, fc.[description]
+--from dbo.FoundationFoods ff 
+--inner join dbo.FoodCategories fc on ff.foodCategoryID = fc.foodCategoryID
+
+--select count(*) from dbo.FoundationFoods -- = 236  --select count(distinct ff.foundationFoodID)
+
+--What all is pertinent to display to users? 
+--food: name, category, nutrients, animal/plant based, common allergies, 
+--Nutrients page w rank: [Proximates(water 100 - Ash 1000), Carbohydrates (1110 Carbohydrate, by difference - Quinic Acid 4700), 
+--Minerals(Calcium 5300-Boron 6245), Vitamins/Other components(vitamin c 6300-vitamin k 8950), lipids (9700 fatty acids - 99999 Specific Gravity)]
+--nutrient name, amount(or median), amount unit, 
+--display by 100 g, or by common portions(would need to use FoodPortions/MeasureUnit tables). 
+--make it look like a nutrition label we are used to? 
+--Raffinose 2300 - Quinic acid 4700
